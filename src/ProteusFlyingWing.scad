@@ -22,14 +22,14 @@ use <mobiuscam.scad>
 
 include <motormountparams.scad> //defines rootChord!
 
-motor = false;
-skid = true;
+motor = true;
+skid = false;
 camera = false;
-forwardSkid = camera || motor;
+forwardSkid = camera;// || motor;
 flexiFilament = true; //Using flexible filament for the Mobius Cam supports (and the nose).
 
 /* [Global] */
-partToGenerate = "ShellOnly"; //[ShellOnly,FuselageRear,FuselageNose,FuselageHatch,RootWing,TipWing,Fin,Elevon,ServoGuard,Hinges]
+partToGenerate = "FuselageHatch"; //[ShellOnly,FuselageRear,FuselageNose,FuselageHatch,RootWing,TipWing,Fin,Elevon,ServoGuard,Hinges]
 
 /* [Printer] */
 printerMaxZ = 230;
