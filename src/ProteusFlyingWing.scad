@@ -1902,7 +1902,7 @@ function interp() =
       let(h = i*(H))
       let(f = shape(i))
       let(x = f*(noseLen)+f*motorTECutout)
-      T_(x,0,h, vec3D(vecInterp(profile1,profile2,f),0))
+      TransXYZ(x,0,h, vec3D(vecInterp(profile1,profile2,f),0))
    ];
 }
 
@@ -1978,7 +1978,7 @@ function interp(hz) =
       let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? finBaseChord*(1-finTopChordFrac):0) )
       //let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? 0*finBaseChord*(1-finTopChordFrac):0) )
       let(y = i>1? finRaise+finHeight*sin(NACAFinAngle):f*finRaise)
-      T_(x,y,h, Rx_(i*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(i)),0)))
+      TransXYZ(x,y,h, Rx_(i*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(i)),0)))
 //      T_(x,y,h, vec3D(vecInterp(profile1,profile2,f),0))
    ];
 
@@ -2083,7 +2083,7 @@ function interp(hz,profile1,profile2) =
       let(f = shape(i))
       let(h = i*(hz))
       let(x = f*maxXShift)
-      T_(x,0,h, vec3D(vecInterp(profile1,profile2,f)*[[(i*profileChordAtMaxTipHeight+(1-i)*chord)/chord,0],[0,1]],0))
+      TransXYZ(x,0,h, vec3D(vecInterp(profile1,profile2,f)*[[(i*profileChordAtMaxTipHeight+(1-i)*chord)/chord,0],[0,1]],0))
    ];
 profile2 = profile*[[xTipFrac,0],[0,xTipFrac/1]];
 scale([1,1,2])

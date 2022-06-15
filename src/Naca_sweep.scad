@@ -108,6 +108,9 @@ function vec3D(v, z=0) = [for(i = [0:len(v)-1])
 
 // Translation - 1D, 2D, 3D point vector //////////////////////////
 // vector along all axes
+function TransXYZ(x=0, y=0, z=0, v) = let(x_ = [x, y, z])
+  [for (i=[0:len(v)-1]) T__(x_[0], x_[1], x_[2], p=v[i])]; 
+
 function T_(x=0, y=0, z=0, v) = let(x_ = (len(x)==3)?x:[x, y, z])
   [for (i=[0:len(v)-1]) T__(x_[0], x_[1], x_[2], p=v[i])]; 
 /// vector along one axis
