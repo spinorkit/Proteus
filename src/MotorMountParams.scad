@@ -1,4 +1,5 @@
-rootChord = 200;
+scaleFactor = 1.1;
+rootChord = scaleFactor*200;
 rimH = 3;//+8; Increase this to move the motor rearwards to get CG correct
 motorTubeLen = 0.6*rootChord;
 motorTubeOD = 30;
