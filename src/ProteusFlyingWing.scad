@@ -1959,27 +1959,34 @@ interpLen = tipChord-finFracTipChord*tipChord;
       //poly3dFromVectors(interp(H));
       //poly3dFromVectors(interp(H+1.25*finThick));
       //}
+
+inc = 0.05;
 //function shapeFuncx(z) = -pow(z,finLEFlatness)*(pow(z,finLEFlatness)-2);
 //function shapeFunc(z) = pow(1-sqrt(1-pow(z,2)),1);
 function shapeFunc(z) = pow(z,3);
 function shapeFuncx(z) = pow((sin((z-0.5)*(180-z*finSweep/finLEFlatness))+1)/2,finLEFlatness);
 function shape(z) = (shapeFunc(z)-shapeFunc(0))/(shapeFunc(1)-shapeFunc(0)); //normalise output to [0,1)
 function shapex(z) = (shapeFuncx(z)-shapeFuncx(0))/(shapeFuncx(1)-shapeFuncx(0)); //normalise output to [0,1)
+
+//z == 1 => 1
+function tipShapeFunc(z) = pow(z,-2);
+function tipShape(z) = (z <= 1+inc ? 1 : tipShapeFunc(z));
 //function shape(z) = z; 
 
 finSweepWithTaper = atan(tan(finSweep)+ tipChord*(1-finTopChordFrac)/finHeight);
+tipHFrac = 8/finHeight;
 
 //Interpolate between 2 profiles using the shape function
 function interp(hz) = 
    [
-   for (i=[0: 1/20 : 1+0.00001])
+   for (i=[0: inc : 1+inc])
       let(f = shape(i))
       let(h = i>1?-(hz+finHeight*cos(NACAFinAngle)):-i*(hz))
       let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? finBaseChord*(1-finTopChordFrac):0) )
       //let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? 0*finBaseChord*(1-finTopChordFrac):0) )
       let(y = i>1? finRaise+finHeight*sin(NACAFinAngle):f*finRaise)
-      TransXYZ(x,y,h, Rx_(i*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(i)),0)))
-//      T_(x,y,h, vec3D(vecInterp(profile1,profile2,f),0))
+         //We use the last i value (i == i+inc) to generate the main, non-curved section of the fin 
+         TransXYZ(x,y,h, Rx_(i*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(i)),0)))
    ];
 
 finVec = [[0,0],[1,0],[finHeightFrac*tan(finSweep)+finTopChordFrac,finHeightFrac],[finHeightFrac*tan(finSweep),finHeightFrac]];
