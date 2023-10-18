@@ -25,11 +25,41 @@ frontScale = 0.7;
 sideScale = 0.35;
 fairingLen = thumbLen+2; //-8;
 
+camAng = 20;
+shimH = 15.5;
+
 duoStripWidth = 43;//25.8+0.4;
 duoStripLen = 11;
 duoStripsThick = 5+0.3;
 
-FairingToPrint();
+
+module Shim(shimH = 24)
+{
+intersection()
+{
+rotate([camAng,0,0])
+translate([0,8-thumbLen,0])
+difference()
+{
+linear_extrude(shimH)
+   projection()
+      rotate([0,90,0])
+         Fairing();
+translate([0,2,0])
+   rotate([0,0,-90])
+   translate([height/2-thumbLen,height/2,shimH])
+   rotate([90,0,0])
+   CamPlusDuoStrip();
+}
+translate([-100,-209,0])
+   cube([200,200,100]);
+}
+}
+
+Shim();
+//CamPlusDuoStrip();
+
+//FairingToPrint();
 //FairingToSubtract();
 //CamToSubtract();
 
@@ -69,6 +99,15 @@ module CamToSubtract()
 Cable();
       }
    }
+}
+
+module CamPlusDuoStrip()
+{
+ThumbPro();
+rotate([0,0,90])
+translate([-duoStripsThick/2,-2*duoStripWidth/3,height/2])
+   duoStrip();
+
 }
 
 
