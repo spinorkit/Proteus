@@ -49,7 +49,7 @@ hingeLen = 30;
 /* [Global] */
 //[ShellOnly,FuselageRear,FuselageNose,FuselageHatch,RootWing,MidWing,TipWing,Fin,
 //Elevon,Flap,ServoGuard,ServoGuardFlaps,SparJoiner, Hinges]
-partToGenerate = "ShellOnly"; //For testing use ""
+partToGenerate = ""; //For testing use ""
 
 midSectionIndex = 0; //Set this to 0 for the middle of the 3 piece wing half
 
@@ -459,7 +459,7 @@ else
    
    //rotate([90,0,0]) FlyingWing();
    //WingTip();
-   //Wing();
+   Wing();
    //WingShell();
    
    //TestSection();
@@ -1973,25 +1973,48 @@ function tipShapeFunc(z) = pow(z,-2);
 function tipShape(z) = (z <= 1+inc ? 1 : tipShapeFunc(z));
 //function shape(z) = z; 
 
+//Tip shape
+function planShapeFunc(z) = pow(z+1,-6);
+function planShape(z) = (planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-planShapeFunc(0)); //normalise output to [0,1)
+tipInc = 0.05;
+
 finSweepWithTaper = atan(tan(finSweep)+ tipChord*(1-finTopChordFrac)/finHeight);
-tipHFrac = 8/finHeight;
+
+tipHFrac = 0.15;
+tipLen = tipHFrac*finHeight;
+tipChord = finBaseChord*finTopChordFrac;
 
 //Interpolate between 2 profiles using the shape function
 function interp(hz) = 
+   let (hTipStart = hz+finHeight*cos(NACAFinAngle), yTipStart = finRaise+finHeight*sin(NACAFinAngle))
+   let (xBlendEnd = interpLen)
+   let (xTipStart = interpLen + finBaseChord*(1-finTopChordFrac))
+   let (xTipSweep = tipHFrac * (xTipStart - xBlendEnd)) //per 1
    [
-   for (i=[0: inc : 1+inc])
+   for (i=[0: inc : 2])
+      let (iLE1 = i > 1 ? 1: i)
       let(f = shape(i))
-      let(h = i>1?-(hz+finHeight*cos(NACAFinAngle)):-i*(hz))
-      let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? finBaseChord*(1-finTopChordFrac):0) )
+      let(h = i>1?-(hTipStart):-i*(hz))
+      let(x = shapex(iLE1)*interpLen+ (i>1? finBaseChord*(1-finTopChordFrac):0) )
       //let(x = shapex(i)*interpLen-0*h*tan(finSweep)+ (i>1? 0*finBaseChord*(1-finTopChordFrac):0) )
-      let(y = i>1? finRaise+finHeight*sin(NACAFinAngle):f*finRaise)
+      let(y = i>1? yTipStart:f*finRaise)
+
+      let (iTip = i - 1)
+      let (hTip = -hTipStart - iTip * tipLen*cos(NACAFinAngle)) //span axis
+      let (xTip = xTipStart + tipChord *(1-planShape(1-iTip))) //chord axis,  planShape(0)==0, planShape(1)==1;
+      let (yTip = yTipStart + iTip * tipLen*sin(NACAFinAngle))  //thickness axis
+      let (xScale = planShape(1-iTip))
+      let (yScale = xScale)
+
+      if(i <= 1+0*inc)
          //We use the last i value (i == i+inc) to generate the main, non-curved section of the fin 
-         TransXYZ(x,y,h, Rx_(i*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(i)),0)))
+         TransXYZ(x,y,h, Rx_(iLE1*NACAFinAngle,vec3D(i>1?finTopChordFrac*profile2:vecInterp(profile1,profile2,shapex(iLE1)),0)))
+      else
+         //(1+inc,2) is the curved back tip of the fin
+         TransXYZ(xTip,yTip,hTip, Rx_(NACAFinAngle,vec3D(finTopChordFrac*profile2*[[xScale,0],[0,yScale]],0)))   
    ];
 
 finVec = [[0,0],[1,0],[finHeightFrac*tan(finSweep)+finTopChordFrac,finHeightFrac],[finHeightFrac*tan(finSweep),finHeightFrac]];
-//intersection()
-   {
 if(NACAfin)
    {
    mirror([0,0,1])
@@ -2006,43 +2029,7 @@ if(NACAfin)
          {
          poly3dFromVectors(blendedVecs);
          //translate([0*(interpLen+H*tan(finSweep)),1*finRaise,-H])
-
-         translate([1*finBaseChord*(1-finTopChordFrac)+interpLen,1*finRaise,-H])
-         rotate([180+NACAFinAngle,0,0])
-            translate([0,0,finHeight])
-               multmatrix(m = [ [1,0 , tipChord*(1-finTopChordFrac)/finHeight, 0],
-                     [0, 1,0 , 0],
-                     [0, 0, 1, 0],
-                     [0, 0, 0,  1]
-                              ])
-
-            FinTipUncambered(profile = profile2*[[finTopChordFrac,0],[0,finTopChordFrac]],chord = finBaseChord*finTopChordFrac);
          }
-
-      //NACA fin foil
-//      translate([interpLen+H*tan(finSweep),1*finRaise,-H])      
-//      rotate([180+NACAFinAngle,0,0])
-//      //Shear to get sweep
-//         multmatrix(m = [ [1,0 , tan(finSweep+finSweepExtraForPrinting), 0],
-//                     [0, 1,0 , 0],
-//                     [0, 0, 1, 0],
-//                     [0, 0, 0,  1]
-//                              ])
-//         {
-//         linear_extrude(height = finHeight, convexity = 5, scale=[finTopChordFrac,finTopChordFrac],$fn=len(profile2)-1)
-//            polygon(profile2);
-//            
-//         //tip of fin
-//         //N.B. using rotate_extrude() here only works properly if
-//         #translate([0,0,finHeight])
-//         if(NACAFinCamber==0)
-//            {
-//            //if(partToGenerate == "Fin") //prevents CGAL assertion in pre-2017 versions of OpenSCAD when rendering TipWing
-//               FinTipUncambered(profile = profile2*[[finTopChordFrac,0],[0,finTopChordFrac]],chord = finBaseChord*finTopChordFrac);
-//            }
-//         else
-//            FinTipCambered(profile = profile2*[[finTopChordFrac,0],[0,finTopChordFrac]],chord = finBaseChord*finTopChordFrac);
-//         }
       }
    }
 else //Semi-blended flat plate finelse //Semi-blended flat plate fin
@@ -2065,8 +2052,6 @@ else //Semi-blended flat plate finelse //Semi-blended flat plate fin
                polygon(finBaseChord*finVec);
          polygon(profile2);
          }
-//   cube([finBaseChord,finHeightFrac*finBaseChord,finThick]);
-      }
    }
 }
 
