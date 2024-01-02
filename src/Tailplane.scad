@@ -93,6 +93,7 @@ function flattenVec3(l) =
 for (a = l) [each a] //extra outer []
 ] ;
 
+//Concatenate 2 lists of 3D vectors, e.g. two profiles with differing z
 function catPoly(L1, L2) = 
 [
 //for(L=[L1, L2], a=L) a //loses ] for L1
