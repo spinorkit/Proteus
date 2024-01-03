@@ -93,13 +93,6 @@ function flattenVec3(l) =
 for (a = l) [each a] //extra outer []
 ] ;
 
-//Concatenate 2 lists of 3D vectors, e.g. two profiles with differing z
-function catPoly(L1, L2) = 
-[
-//for(L=[L1, L2], a=L) a //loses ] for L1
-L1, for(L=L2) L
-];
-
 function tipVecs(tipLen) = 
    [
    //TransXYZ(0,0,-span/2, vec3D( profileRoot)),
@@ -113,20 +106,13 @@ function tipVecs(tipLen) =
       TransXYZ(x,y,h, vec3D( profileTip*[[xScale,0],[0,yScale]]))
    ];
 
-M = [ [ 1  , 0  , 0  , 0   ],
-      [ 0  , 1  , 0,   0   ],  // The "0.7" is the skew value; pushed along the y axis as z changes.
-      [ 0  , 0  , 1  , -span/2   ],
-      [ 0  , 0  , 0  , 1   ] ] ;
-
-ZOff = [0,0,-span/2];
-
 function wingVecs(span) = 
    let (profileRoot3D = vec3D( profileRoot))
-   catPoly( [for (v = profileRoot3D) v+[0,0,-span]],
+   catPoly3D( [for (v = profileRoot3D) v+[0,0,-span]],
       //TransXYZ(0,0,-span, profileRoot3D),
       //catPoly( TransXYZ(0,0,-span/2, vec3D( profileRoot)),
-      catPoly( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
-      tipVecs(tipLen))
+      catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
+      translatePoly3D([-100,0,0], tipVecs(tipLen)))
    );
 
 //function wingVecs(span) = 
@@ -138,9 +124,15 @@ module TailPlane()
 
 //blendedVecs = [[TransXYZ(0,0,-span/2, vec3D( profileRoot))], [tipVecs(span/2)]];
 //blendedVecs = [[TransXYZ(0,0,-span/2, vec3D( profileRoot))],[tipVecs(span/2)]];
-wingVs = wingVecs(span);
-echo(wingVs);
+//wingVs = rotatePoly3D([0, 0, 0 ], wingVecs(span));
 
+dihedral = 20;
+
+shearYAlongZ = [[1,0,0],[0,1,tan(dihedral)],[0,0,1]];
+
+wingVs = multPoly3D(shearYAlongZ, wingVecs(span));
+echo(wingVs);
+rotate([0,0,0])
       multmatrix(m = [ [1,0 , -1*tan(sweep+sweepExtraForPrinting), 0],
                      [0, 1,0 , 0],
                      [0, 0, 1, 0],
