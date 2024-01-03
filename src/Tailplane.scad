@@ -26,10 +26,10 @@ echo("thick=",thick);
 tipLen = 0.1*span;
 halfSpan = span/2-tipLen;
 
-sweep = 0;
+sweep = 10;
 sweepExtraForPrinting = 0;
 
-nFoilPoints = 6;
+nFoilPoints = 100;
 
 function FoilNACA(chord = 100,N = 120/*len(airfoil)*/, thick = 0.08) = 
    TransXYZ(-chord,0,0,airfoil_data([-NACACamber,0.33,thick], chord, N, false));
@@ -69,7 +69,7 @@ function planShape(z) = (planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-pl
 
 tipFrac = tipLen/halfSpan;
 
-tipInc = 0.2;//0.05;
+tipInc = 0.05;
 
 //function tipVecs(hz) = 
 //   [
@@ -112,7 +112,7 @@ function wingVecs(span) =
       //TransXYZ(0,0,-span, profileRoot3D),
       //catPoly( TransXYZ(0,0,-span/2, vec3D( profileRoot)),
       catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
-      translatePoly3D([-100,0,0], tipVecs(tipLen)))
+      translatePoly3D([0,0,0], tipVecs(tipLen)))
    );
 
 //function wingVecs(span) = 
@@ -126,18 +126,19 @@ module TailPlane()
 //blendedVecs = [[TransXYZ(0,0,-span/2, vec3D( profileRoot))],[tipVecs(span/2)]];
 //wingVs = rotatePoly3D([0, 0, 0 ], wingVecs(span));
 
-dihedral = 20;
+dihedral = 10;
 
-shearYAlongZ = [[1,0,0],[0,1,tan(dihedral)],[0,0,1]];
+
+shearYAlongZ = [[1,0,1*tan(sweep+sweepExtraForPrinting)],[0,1,tan(dihedral)],[0,0,1]];
 
 wingVs = multPoly3D(shearYAlongZ, wingVecs(span));
 echo(wingVs);
 rotate([0,0,0])
-      multmatrix(m = [ [1,0 , -1*tan(sweep+sweepExtraForPrinting), 0],
-                     [0, 1,0 , 0],
-                     [0, 0, 1, 0],
-                     [0, 0, 0,  1]
-                              ])
+//      multmatrix(m = [ [1,0 , -1*tan(sweep+sweepExtraForPrinting), 0],
+//                     [0, 1,0 , 0],
+//                     [0, 0, 1, 0],
+//                     [0, 0, 0,  1]
+//                              ])
          {
          poly3dFromVectors(wingVs);
          }
