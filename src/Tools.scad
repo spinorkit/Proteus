@@ -56,6 +56,18 @@ function rotatePoly3D(ang, poly3D) =
    for (poly2D = poly3D) [for (v = poly2D) rot*v]
    ];
 
+function scalePoly3D(scale3, poly3D) = 
+   [
+   let (matrix3D = 
+      [
+      [scale3.x, 0,        0],
+      [0,        scale3.y, 0],
+      [0,        0, scale3.z]
+      ])
+   for (poly2D = poly3D) [for (v = poly2D) matrix3D*v]
+   ];
+
+
 function multPoly3D(matrix3D, poly3D) = 
    [
    for (poly2D = poly3D) [for (v = poly2D) matrix3D*v]

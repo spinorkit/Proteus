@@ -128,11 +128,10 @@ module TailPlane()
 
 dihedral = 10;
 
+shears = [[1,0,1*tan(sweep+sweepExtraForPrinting)],[0,1,tan(dihedral)],[0,0,1]];
 
-shearYAlongZ = [[1,0,1*tan(sweep+sweepExtraForPrinting)],[0,1,tan(dihedral)],[0,0,1]];
-
-wingVs = multPoly3D(shearYAlongZ, wingVecs(span));
-echo(wingVs);
+wingVs = multPoly3D(shears, scalePoly3D([1,1,1],wingVecs(span)));
+//echo(wingVs);
 rotate([0,0,0])
 //      multmatrix(m = [ [1,0 , -1*tan(sweep+sweepExtraForPrinting), 0],
 //                     [0, 1,0 , 0],
