@@ -8,9 +8,9 @@ use <Naca_sweep.scad>
 
 // generate polyhedron from multiple airfoil_datasets
 //Just a name change for Rudolf Huttary's sweep() to avoid name clashes
-module poly3dFromVectors(dat, convexity = 5) // dat - vec of vec, with vec = airfoil_data
+module poly3dFromVectors(dat, convexity = 5, showslices = false, close = false) // dat - vec of vec, with vec = airfoil_data
 {
-sweep(dat = dat, convexity = convexity);
+sweep(dat = dat, convexity = convexity, showslices = showslices, close = close);
 }
 
 //Interpolate between two polygons specified as equal length vectors v1 and v2
@@ -20,6 +20,46 @@ function vecInterp(v1, v2, f) =
    for(i=[0:len(v1)-1]) (1-f)*v1[i]+f*v2[i]
    ];
 
+//Concatenate 2 lists of 3D vectors, e.g. two profiles with differing z
+function catPoly3D(L1, L2) = 
+   [
+   //for(L=[L1, L2], a=L) a //loses ] for L1
+   L1, for(L=L2) L
+   ];
+
+function translatePoly3D(offset, poly3D) = 
+   [
+   for (poly2D = poly3D) [for (v = poly2D) v+offset]
+   ];
+
+function rotatePoly3D(ang, poly3D) = 
+   let (rotx = 
+      [
+      [1,          0,           0],
+      [0, cos(ang.x), -sin(ang.x)],
+      [0, sin(ang.x),  cos(ang.x)]
+      ])
+   let (roty = 
+      [
+      [cos(ang.y),   0,  sin(ang.y)],
+      [0,            1,           0],
+      [-sin(ang.y),   0,  cos(ang.y)]
+      ])
+   let (rotz = 
+      [
+      [cos(ang.z), -sin(ang.z), 0],
+      [sin(ang.z),  cos(ang.z), 0],
+      [         0,           0, 1]
+      ])
+   let (rot = rotz*roty*rotx)
+   [
+   for (poly2D = poly3D) [for (v = poly2D) rot*v]
+   ];
+
+function multPoly3D(matrix3D, poly3D) = 
+   [
+   for (poly2D = poly3D) [for (v = poly2D) matrix3D*v]
+   ];
 
 //CG calculation
 //N.B. this assumes the fuselage (or at least nose of the fuselage) does not generate
