@@ -26,7 +26,7 @@ echo("thick=",thick);
 tipLen = 0.1*span;
 halfSpan = span/2-tipLen;
 
-sweep = 10;
+sweep = 0;
 sweepExtraForPrinting = 0;
 
 nFoilPoints = 100;
@@ -36,8 +36,12 @@ function FoilNACA(chord = 100,N = 120/*len(airfoil)*/, thick = 0.08) =
 
 //translate([0,0,span/2]) mirror([0,0,1])TailPlane();
 
-
-TailPlane();
+difference()
+   {
+   TailPlane();
+   translate([0,0,-100])
+      cube([100,100,100],true);
+   }
 
 //polygon(100*profileRoot);
   
@@ -106,13 +110,23 @@ function tipVecs(tipLen) =
       TransXYZ(x,y,h, vec3D( profileTip*[[xScale,0],[0,yScale]]))
    ];
 
+//function wingVecs(span) = 
+//   let (profileRoot3D = vec3D( profileRoot))
+//   catPoly3D( [for (v = profileRoot3D) v+[0,0,-span]],
+//      //TransXYZ(0,0,-span, profileRoot3D),
+//      //catPoly( TransXYZ(0,0,-span/2, vec3D( profileRoot)),
+//      catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
+//      translatePoly3D([0,0,0], tipVecs(tipLen)))
+//   );
+
+
 function wingVecs(span) = 
    let (profileRoot3D = vec3D( profileRoot))
-   catPoly3D( [for (v = profileRoot3D) v+[0,0,-span]],
+   catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],
       //TransXYZ(0,0,-span, profileRoot3D),
       //catPoly( TransXYZ(0,0,-span/2, vec3D( profileRoot)),
-      catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
-      translatePoly3D([0,0,0], tipVecs(tipLen)))
+      //catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
+      translatePoly3D([0,0,0], tipVecs(tipLen))
    );
 
 //function wingVecs(span) = 
