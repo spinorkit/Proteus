@@ -38,7 +38,7 @@ profileTip = rootProfile;
 
 //EleExtX2();
 
-CurvedTip();
+CurvedTipExt();
 
 
 
@@ -85,7 +85,7 @@ function planShapeFunc(z) = 1;//pow(2-z,-6);
 function planShape(z) = 1;//(planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-planShapeFunc(0)); //normalise output to [0,1)
 
 
-module CurvedTip()
+module CurvedTipExt()
 {
 maxAngle = 90;
 function curveFn(z) = z;//pow(z,3);
