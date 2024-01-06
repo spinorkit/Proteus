@@ -14,6 +14,8 @@ midLen = 119;
 aileronLen = 485;
 tipLen = 20;//135;
 
+tipRadius = 31; //I think!
+
 rootWidth = 15;
 tipWidth = 13;
 
