@@ -4,7 +4,7 @@ use <naca4.scad>
 
 
 
-TEExt = 3;
+TEExt = 3; //printing support
 thick = 3.8;
 //tipLen = 26;
 
@@ -22,12 +22,12 @@ tipWidth = 13;
 eleLen = flapLen/3;
 //eleLen = rootLen;
 
-width = rootWidth+TEExt;
+//width = rootWidth+TEExt;
 
 
 cutAng = 0;//90-55;
 
-TELen = eleLen-width*tan(cutAng);
+//TELen = eleLen-width*tan(cutAng);
 
 offsetY  = 20;
 
@@ -35,8 +35,8 @@ $fn = 128;
 
 top = false;
 
-rootProfile = [[0,0],[width, thick], [width, 0],[0,0]];
-profileTip = rootProfile;
+rootProfile = [[0,0],[0, thick], [rootWidth, 0],[0,0]];
+profileTip = [[0,0],[0, thick], [tipWidth, 0],[0,0]];
 
 //EleExtX2();
 
@@ -83,25 +83,28 @@ translate([0,offsetY/2,0])
 
 //TipExt();
 
-function planShapeFunc(z) = 1;//pow(2-z,-6);
-function planShape(z) = 1;//(planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-planShapeFunc(0)); //normalise output to [0,1)
+//function planShapeFunc(z) = 1;//pow(2-z,-6);
+//function planShape(z) = 1;//(planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-planShapeFunc(0)); //normalise output to [0,1)
 
 
 module CurvedTipExt()
 {
 maxAngle = 90;
+function planShapeFunc(z) = pow(z,3);
+function planShape(z) = (planShapeFunc(z)-planShapeFunc(0))/(planShapeFunc(1)-planShapeFunc(0)); //normalise output to [0,1)
+
 function curveFn(z) = z;//pow(z,3);
 function curve(z) = (curveFn(z)-curveFn(0))/(curveFn(1)-curveFn(0)); //normalise output to [0,1)
-tipInc = 0.1;
+tipInc = 0.05;
 function tipVecs() = 
    [
    for(i = [0: tipInc : 1])
-      let (x =  0*planShape(i))
-      let (xScale = 1)//1-planShape(i))
+      let (x =  0) //0*planShape(i))
+      let (xScale = 1-planShape(i))
       let (yScale = xScale)
       let (angle = maxAngle*curve(i))
-      let (y = width*(cos(angle))-width)
-      let (h = tipLen*(sin(angle)))
+      let (y = -tipRadius*(cos(angle))-0*tipRadius)
+      let (h = tipRadius*(sin(angle)))
       TransXYZ(x,y,h, Rx_(angle,vec3D( profileTip*[[xScale,0],[0,yScale]])))
    ];
 vecs = tipVecs();
