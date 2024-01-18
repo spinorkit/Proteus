@@ -108,7 +108,7 @@ function tipVecs() =
       let (angle = maxAngle*curve(i))
       let (y = -tipRadius*(cos(angle))-0*tipRadius)
       let (h = tipRadius*(sin(angle)))
-      TransXYZ(x,y,h, Rx_(angle,vec3D( profileTip*[[xScale,0],[0,yScale]])))
+      TransXYZ(x,y,h, Rx_(-angle,vec3D( profileTip*[[xScale,0],[0,yScale]])))
    ];
 vecs = tipVecs();
 //echo(vecs);
