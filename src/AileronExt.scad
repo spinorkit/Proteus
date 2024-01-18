@@ -14,11 +14,11 @@ aileronLen = 485;
 aileronTaperLen = 240;
 tipLen = 20;//135;
 
-tipRadius = 31; //I think!
+tipRadius = 31+1.5; //I think!
 
 extraWidthForPrinting = 3;
 rootWidth = 15+extraWidthForPrinting;
-tipWidth = 13+extraWidthForPrinting;
+tipWidth = 11+extraWidthForPrinting;
 
 eleLen = flapLen/3;
 //eleLen = rootLen;
@@ -43,9 +43,11 @@ profileTip = [[0,0],[0, thick], [tipWidth, 0],[0,0]];
 
 //EleExtX2();
 
-CurvedTipExt();
+//CurvedTipExt();
 
 //AileronTapered();
+
+AileronExt();
 
 
 
@@ -135,6 +137,26 @@ function vecsFunc(span) =
 vecs = vecsFunc(span);
 echo(vecs);
 poly3dFromVectors(vecs);
+}
+
+module AileronExt(span = 200)
+{
+function vecsFunc(span) = 
+   let (profileRoot3D = vec3D( profileRoot))
+   let (profileTip3D = vec3D( profileRoot))
+   catPoly3D( 
+      profileRoot3D,
+      [[for (v = profileTip3D) v+[0,0,span]]]
+      //[for (v = profileRoot3D) v+[0,0,span]],
+      //TransXYZ(0,0,-span, profileRoot3D),
+      //catPoly( TransXYZ(0,0,-span/2, vec3D( profileRoot)),
+      //catPoly3D( [for (v = profileRoot3D) v+[0,0,-span/2]],//M*vec3D( profileRoot),
+      //translatePoly3D([0,0,0], profileTip3D)
+   );
+vecs = vecsFunc(span);
+echo(vecs);
+poly3dFromVectors(vecs);
+
 }
 
 
