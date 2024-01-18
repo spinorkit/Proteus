@@ -4,7 +4,6 @@ use <naca4.scad>
 
 
 
-TEExt = 3; //printing support
 thick = 3.8;
 //tipLen = 26;
 
@@ -17,8 +16,9 @@ tipLen = 20;//135;
 
 tipRadius = 31; //I think!
 
-rootWidth = 15;
-tipWidth = 13;
+extraWidthForPrinting = 3;
+rootWidth = 15+extraWidthForPrinting;
+tipWidth = 13+extraWidthForPrinting;
 
 eleLen = flapLen/3;
 //eleLen = rootLen;
@@ -32,6 +32,8 @@ cutAng = 0;//90-55;
 
 offsetY  = 20;
 
+TEExt = 3; //printing support
+
 $fn = 128;
 
 top = false;
@@ -41,9 +43,9 @@ profileTip = [[0,0],[0, thick], [tipWidth, 0],[0,0]];
 
 //EleExtX2();
 
-//CurvedTipExt();
+CurvedTipExt();
 
-AileronTapered();
+//AileronTapered();
 
 
 
