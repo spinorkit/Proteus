@@ -139,7 +139,7 @@ echo(vecs);
 poly3dFromVectors(vecs);
 }
 
-module AileronExt(span = 200)
+module AileronExt(span = 180)
 {
 function vecsFunc(span) = 
    let (profileRoot3D = vec3D( profileRoot))
